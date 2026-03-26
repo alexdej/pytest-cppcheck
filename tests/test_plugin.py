@@ -98,14 +98,14 @@ def test_cache_skips_on_second_run(pytester):
 
 
 def test_cache_reruns_after_file_change(pytester):
+    import os
     path = pytester.makefile(".c", clean=C_CLEAN)
     # First run
     result = pytester.runpytest("--cppcheck", "-p", "cacheprovider")
     result.assert_outcomes(passed=1)
-    # Touch the file to change mtime
-    import time
-    time.sleep(0.1)
-    path.write_text(C_CLEAN)
+    # Bump mtime explicitly to avoid filesystem resolution issues
+    st = path.stat()
+    os.utime(path, ns=(st.st_atime_ns, st.st_mtime_ns + 1_000_000_000))
     # Second run: re-checked because mtime changed
     result = pytester.runpytest("--cppcheck", "-p", "cacheprovider")
     result.assert_outcomes(passed=1)
