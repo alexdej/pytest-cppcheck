@@ -7,33 +7,17 @@ reported as a pass or failure in the normal pytest output.
 Useful for Python projects with C extension modules where you already run pytest
 and want cppcheck findings surfaced in the same test run.
 
-## Requirements
-
-- Python 3.8+
-- pytest 7.0+
-- cppcheck installed on PATH (install via your system package manager, e.g.
-  `apt install cppcheck`, `brew install cppcheck`)
-
 ## Installation
-
-First, install cppcheck via your system package manager:
-
-```
-# Ubuntu/Debian
-apt install cppcheck
-
-# macOS
-brew install cppcheck
-
-# Windows
-choco install cppcheck
-```
-
-Then install the plugin:
 
 ```
 pip install pytest-cppcheck
 ```
+
+This pulls in cppcheck automatically via the
+[cppcheck](https://pypi.org/project/cppcheck/) PyPI package. If you prefer a
+specific version, install cppcheck yourself via your system package manager
+(`apt install cppcheck`, `brew install cppcheck`, etc.) — the plugin uses
+whichever `cppcheck` is on PATH.
 
 ## Usage
 
