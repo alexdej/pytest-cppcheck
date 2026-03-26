@@ -9,6 +9,7 @@ description = "A pytest plugin that runs cppcheck static analysis on C/C++ sourc
 requires-python = ">=3.8"
 dependencies = [
     "pytest>=7.0",
+    "cppcheck",
 ]
 classifiers = [
     "Framework :: Pytest",
