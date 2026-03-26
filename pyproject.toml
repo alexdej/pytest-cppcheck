@@ -6,6 +6,11 @@ build-backend = "setuptools.build_meta"
 name = "pytest-cppcheck"
 version = "0.1.0"
 description = "A pytest plugin that runs cppcheck static analysis on C/C++ source files"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Alex DeJarnatt", email = "adejarnatt@gmail.com" },
+]
 requires-python = ">=3.8"
 dependencies = [
     "pytest>=7.0",
@@ -16,6 +21,10 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
 ]
+
+[project.urls]
+Homepage = "https://github.com/alexdej/pytest-cppcheck"
+Repository = "https://github.com/alexdej/pytest-cppcheck"
 
 [project.entry-points."pytest11"]
 cppcheck = "pytest_cppcheck.plugin"
