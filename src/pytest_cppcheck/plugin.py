@@ -15,12 +15,6 @@ def pytest_addoption(parser):
         default=False,
         help="run cppcheck on C/C++ source files",
     )
-    group.addoption(
-        "--no-cppcheck-cache",
-        action="store_true",
-        default=False,
-        help="disable cppcheck caching, re-check every file",
-    )
     parser.addini(
         "cppcheck_extensions",
         type="args",
@@ -65,8 +59,6 @@ class CppcheckFile(pytest.File):
 
 class CppcheckItem(pytest.Item):
     def setup(self):
-        if self.config.getoption("no_cppcheck_cache"):
-            return
         mtimes = getattr(self.config, "_cppcheck_mtimes", {})
         self._mtime = self.path.stat().st_mtime
         args = self.config.getini("cppcheck_args")

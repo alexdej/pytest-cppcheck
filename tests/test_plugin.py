@@ -139,11 +139,11 @@ def test_cache_does_not_skip_failures(pytester):
     result.assert_outcomes(failed=1)
 
 
-def test_no_cppcheck_cache_flag(pytester):
+def test_cache_clear_forces_rerun(pytester):
     pytester.makefile(".c", clean=C_CLEAN)
     # First run: passes and populates cache
     result = pytester.runpytest("--cppcheck", "-p", "cacheprovider")
     result.assert_outcomes(passed=1)
-    # Second run with --no-cppcheck-cache: re-checked
-    result = pytester.runpytest("--cppcheck", "--no-cppcheck-cache", "-p", "cacheprovider")
+    # Second run with --cache-clear: re-checked
+    result = pytester.runpytest("--cppcheck", "--cache-clear", "-p", "cacheprovider")
     result.assert_outcomes(passed=1)
