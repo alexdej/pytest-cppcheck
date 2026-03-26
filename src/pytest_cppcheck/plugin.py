@@ -30,13 +30,19 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    if config.getoption("cppcheck"):
-        config._cppcheck_mtimes = config.cache.get(CACHE_KEY, {})
+    if not config.getoption("cppcheck"):
+        return
+    cache = getattr(config, "cache", None)
+    config._cppcheck_mtimes = cache.get(CACHE_KEY, {}) if cache else {}
 
 
 def pytest_unconfigure(config):
-    if hasattr(config, "_cppcheck_mtimes"):
-        config.cache.set(CACHE_KEY, config._cppcheck_mtimes)
+    mtimes = getattr(config, "_cppcheck_mtimes", None)
+    if mtimes is None:
+        return
+    cache = getattr(config, "cache", None)
+    if cache:
+        cache.set(CACHE_KEY, mtimes)
 
 
 def pytest_collect_file(parent, file_path):
