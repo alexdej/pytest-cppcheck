@@ -59,14 +59,8 @@ configuration:
 [pytest]
 cppcheck_args =
     --enable=warning,style,performance,portability
-    --suppress=missingIncludeSystem
-    --suppress=normalCheckLevelMaxBranches
+    --check-level=exhaustive
 ```
-
-`missingIncludeSystem` suppresses noise about system headers that aren't
-available to cppcheck. `normalCheckLevelMaxBranches` suppresses an
-informational message that cppcheck emits on complex files and that would
-otherwise be reported as a failure.
 
 ### `cppcheck_extensions`
 
