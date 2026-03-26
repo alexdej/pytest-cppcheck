@@ -58,7 +58,10 @@ class CppcheckItem(pytest.Item):
         cmd = ["cppcheck", "--quiet", "--error-exitcode=1"] + args + [str(self.path)]
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
-            raise CppcheckError(result.stderr)
+            output = result.stderr or result.stdout
+            if not output:
+                output = f"cppcheck exited with code {result.returncode}"
+            raise CppcheckError(output)
 
     def repr_failure(self, excinfo):
         if excinfo.errisinstance(CppcheckError):
