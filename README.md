@@ -48,17 +48,25 @@ All options go in `pyproject.toml`, `pytest.ini`, or `setup.cfg` under `[pytest]
 
 Extra arguments forwarded to every cppcheck invocation. This is the main
 configuration surface — use it for `--enable`, `--suppress`, and any other
-cppcheck flags.
+cppcheck flags. The plugin always passes `--quiet` and `--error-exitcode=1`
+automatically.
+
+With no `cppcheck_args`, cppcheck runs its default checks (mostly
+error-severity). Use `--enable` to broaden coverage. A good starting
+configuration:
 
 ```ini
 [pytest]
 cppcheck_args =
     --enable=warning,style,performance,portability
-    --check-level=exhaustive
     --suppress=missingIncludeSystem
+    --suppress=normalCheckLevelMaxBranches
 ```
 
-The plugin always passes `--quiet` and `--error-exitcode=1` automatically.
+`missingIncludeSystem` suppresses noise about system headers that aren't
+available to cppcheck. `normalCheckLevelMaxBranches` suppresses an
+informational message that cppcheck emits on complex files and that would
+otherwise be reported as a failure.
 
 ### `cppcheck_extensions`
 
