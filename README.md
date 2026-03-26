@@ -76,6 +76,17 @@ File extensions to collect. Default: `.c .cpp`.
 cppcheck_extensions = .c .cpp .h
 ```
 
+## Markers
+
+All cppcheck items are marked with `cppcheck`, so you can select or exclude
+them with `-m`:
+
+```
+pytest --cppcheck -m cppcheck           # only cppcheck
+pytest --cppcheck -m "unit or cppcheck" # unit tests + cppcheck
+pytest --cppcheck -m "not cppcheck"     # everything except cppcheck
+```
+
 ## Caching
 
 Results are cached based on file modification time and `cppcheck_args`. On
