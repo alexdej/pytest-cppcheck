@@ -4,6 +4,7 @@ import pytest
 from cppcheck import get_cppcheck_dir
 
 CPPCHECK_BIN = str(get_cppcheck_dir() / "cppcheck")
+CACHE_KEY = "cppcheck/mtimes"
 
 
 def pytest_addoption(parser):
@@ -28,6 +29,22 @@ def pytest_addoption(parser):
     )
 
 
+def pytest_configure(config):
+    if not config.getoption("cppcheck"):
+        return
+    cache = getattr(config, "cache", None)
+    config._cppcheck_mtimes = cache.get(CACHE_KEY, {}) if cache else {}
+
+
+def pytest_unconfigure(config):
+    mtimes = getattr(config, "_cppcheck_mtimes", None)
+    if mtimes is None:
+        return
+    cache = getattr(config, "cache", None)
+    if cache:
+        cache.set(CACHE_KEY, mtimes)
+
+
 def pytest_collect_file(parent, file_path):
     if not parent.config.getoption("cppcheck"):
         return None
@@ -47,6 +64,14 @@ class CppcheckFile(pytest.File):
 
 
 class CppcheckItem(pytest.Item):
+    def setup(self):
+        mtimes = getattr(self.config, "_cppcheck_mtimes", {})
+        self._mtime = self.path.stat().st_mtime_ns
+        args = self.config.getini("cppcheck_args")
+        old = mtimes.get(str(self.path))
+        if old == [self._mtime, args]:
+            pytest.skip("previously passed cppcheck")
+
     def runtest(self):
         args = self.config.getini("cppcheck_args")
         cmd = [CPPCHECK_BIN, "--quiet", "--error-exitcode=1"] + args + [str(self.path)]
@@ -56,6 +81,13 @@ class CppcheckItem(pytest.Item):
             if not output:
                 output = f"cppcheck exited with code {result.returncode}"
             raise CppcheckError(output)
+        # Cache only on success
+        if hasattr(self.config, "_cppcheck_mtimes"):
+            self._mtime = getattr(self, "_mtime", self.path.stat().st_mtime_ns)
+            self.config._cppcheck_mtimes[str(self.path)] = [
+                self._mtime,
+                args,
+            ]
 
     def repr_failure(self, excinfo):
         if excinfo.errisinstance(CppcheckError):

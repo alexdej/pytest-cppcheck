@@ -85,3 +85,65 @@ def test_cppcheck_args_forwarded(pytester):
     pytester.makefile(".c", bad=C_ERROR)
     result = pytester.runpytest("--cppcheck")
     result.assert_outcomes(passed=1)
+
+
+def test_cache_skips_on_second_run(pytester):
+    pytester.makefile(".c", clean=C_CLEAN)
+    # First run: passes and populates cache
+    result = pytester.runpytest("--cppcheck", "-p", "cacheprovider")
+    result.assert_outcomes(passed=1)
+    # Second run: skipped via cache
+    result = pytester.runpytest("--cppcheck", "-p", "cacheprovider")
+    result.assert_outcomes(skipped=1)
+
+
+def test_cache_reruns_after_file_change(pytester):
+    import os
+    path = pytester.makefile(".c", clean=C_CLEAN)
+    # First run
+    result = pytester.runpytest("--cppcheck", "-p", "cacheprovider")
+    result.assert_outcomes(passed=1)
+    # Bump mtime explicitly to avoid filesystem resolution issues
+    st = path.stat()
+    os.utime(path, ns=(st.st_atime_ns, st.st_mtime_ns + 1_000_000_000))
+    # Second run: re-checked because mtime changed
+    result = pytester.runpytest("--cppcheck", "-p", "cacheprovider")
+    result.assert_outcomes(passed=1)
+
+
+def test_cache_reruns_after_args_change(pytester):
+    pytester.makefile(".c", clean=C_CLEAN)
+    # First run
+    result = pytester.runpytest("--cppcheck", "-p", "cacheprovider")
+    result.assert_outcomes(passed=1)
+    # Second run with different args: re-checked
+    pytester.makeini(
+        "[pytest]\n"
+        "cppcheck_args = --enable=warning\n"
+    )
+    result = pytester.runpytest("--cppcheck", "-p", "cacheprovider")
+    result.assert_outcomes(passed=1)
+
+
+def test_cache_does_not_skip_failures(pytester):
+    pytester.makeini(
+        "[pytest]\n"
+        "cppcheck_args = --enable=warning\n"
+    )
+    pytester.makefile(".c", bad=C_ERROR)
+    # First run: fails
+    result = pytester.runpytest("--cppcheck", "-p", "cacheprovider")
+    result.assert_outcomes(failed=1)
+    # Second run: still fails (not cached)
+    result = pytester.runpytest("--cppcheck", "-p", "cacheprovider")
+    result.assert_outcomes(failed=1)
+
+
+def test_cache_clear_forces_rerun(pytester):
+    pytester.makefile(".c", clean=C_CLEAN)
+    # First run: passes and populates cache
+    result = pytester.runpytest("--cppcheck", "-p", "cacheprovider")
+    result.assert_outcomes(passed=1)
+    # Second run with --cache-clear: re-checked
+    result = pytester.runpytest("--cppcheck", "--cache-clear", "-p", "cacheprovider")
+    result.assert_outcomes(passed=1)
