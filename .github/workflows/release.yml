@@ -14,6 +14,25 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Verify tag matches package version
+        run: |
+          pkg_version=$(python -c "
+          import sys, tomllib
+          try:
+              with open('pyproject.toml', 'rb') as f:
+                  data = tomllib.load(f)
+              print(data['project']['version'])
+          except (FileNotFoundError, KeyError) as e:
+              print(f'Error reading version from pyproject.toml: {e}', file=sys.stderr)
+              sys.exit(1)
+          ")
+          tag_version="${{ github.ref_name }}"
+          tag_version="${tag_version#v}"
+          if [ "$pkg_version" != "$tag_version" ]; then
+            echo "Tag version '$tag_version' does not match package version '$pkg_version'" >&2
+            exit 1
+          fi
+
       - name: Install build tools
         run: pip install build
 
