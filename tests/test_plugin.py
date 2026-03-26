@@ -20,7 +20,8 @@ int main() {
 
 def test_clean_file_passes(pytester):
     pytester.makefile(".c", clean=C_CLEAN)
-    result = pytester.runpytest("--cppcheck")
+    result = pytester.runpytest("--cppcheck", "-v")
+    result.stdout.fnmatch_lines(["*PASSED*"])
     result.assert_outcomes(passed=1)
 
 
