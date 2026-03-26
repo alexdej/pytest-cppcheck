@@ -29,6 +29,7 @@ jobs:
         with:
           name: dist
           path: dist/
+          if-no-files-found: error
 
   pypi:
     needs: build
