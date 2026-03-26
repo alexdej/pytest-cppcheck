@@ -4,10 +4,6 @@ on:
   push:
     tags: ["v*"]
 
-permissions:
-  contents: write
-  id-token: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -35,6 +31,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment: pypi
+    permissions:
+      id-token: write
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -47,6 +45,8 @@ jobs:
   github-release:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
