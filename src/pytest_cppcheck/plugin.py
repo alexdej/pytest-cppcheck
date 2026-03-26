@@ -1,7 +1,9 @@
 import subprocess
-import sys
 
 import pytest
+from cppcheck import get_cppcheck_dir
+
+CPPCHECK_BIN = str(get_cppcheck_dir() / "cppcheck")
 
 
 def pytest_addoption(parser):
@@ -26,19 +28,6 @@ def pytest_addoption(parser):
     )
 
 
-def pytest_configure(config):
-    if not config.getoption("cppcheck"):
-        return
-    result = subprocess.run(
-        [sys.executable, "-m", "cppcheck", "--version"],
-        capture_output=True,
-    )
-    if result.returncode != 0:
-        raise pytest.UsageError(
-            "cppcheck not found. Install it with: pip install cppcheck"
-        )
-
-
 def pytest_collect_file(parent, file_path):
     if not parent.config.getoption("cppcheck"):
         return None
@@ -60,7 +49,7 @@ class CppcheckFile(pytest.File):
 class CppcheckItem(pytest.Item):
     def runtest(self):
         args = self.config.getini("cppcheck_args")
-        cmd = [sys.executable, "-m", "cppcheck", "--quiet", "--error-exitcode=1"] + args + [str(self.path)]
+        cmd = [CPPCHECK_BIN, "--quiet", "--error-exitcode=1"] + args + [str(self.path)]
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
             output = result.stderr or result.stdout
