@@ -30,6 +30,7 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
+    config.addinivalue_line("markers", "cppcheck: cppcheck static analysis test")
     if not config.getoption("cppcheck"):
         return
     cache = getattr(config, "cache", None)
@@ -60,7 +61,9 @@ class CppcheckError(Exception):
 
 class CppcheckFile(pytest.File):
     def collect(self):
-        yield CppcheckItem.from_parent(self, name="CPPCHECK")
+        item = CppcheckItem.from_parent(self, name="CPPCHECK")
+        item.add_marker(pytest.mark.cppcheck)
+        yield item
 
 
 class CppcheckItem(pytest.Item):
