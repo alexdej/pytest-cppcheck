@@ -1,5 +1,10 @@
 # pytest-cppcheck
 
+[![CI](https://github.com/alexdej/pytest-cppcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/alexdej/pytest-cppcheck/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/pytest-cppcheck)](https://pypi.org/project/pytest-cppcheck/)
+[![Python](https://img.shields.io/pypi/pyversions/pytest-cppcheck)](https://pypi.org/project/pytest-cppcheck/)
+[![License](https://img.shields.io/pypi/l/pytest-cppcheck)](https://github.com/alexdej/pytest-cppcheck/blob/main/LICENSE)
+
 A pytest plugin that runs [cppcheck](https://cppcheck.sourceforge.io/) static
 analysis on C/C++ source files. Each file is collected as a test item and
 reported as a pass or failure in the normal pytest output.
