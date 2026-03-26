@@ -19,10 +19,7 @@ pip install pytest-cppcheck
 ```
 
 This pulls in cppcheck automatically via the
-[cppcheck](https://pypi.org/project/cppcheck/) PyPI package. If you prefer a
-specific version, install cppcheck yourself via your system package manager
-(`apt install cppcheck`, `brew install cppcheck`, etc.) — the plugin uses
-whichever `cppcheck` is on PATH.
+[cppcheck](https://pypi.org/project/cppcheck/) PyPI package.
 
 ## Usage
 
