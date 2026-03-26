@@ -7,7 +7,7 @@ name = "pytest-cppcheck"
 version = "0.1.0"
 description = "A pytest plugin that runs cppcheck static analysis on C/C++ source files"
 readme = "README.md"
-license = "MIT"
+license = {file = "LICENSE"}
 authors = [
     { name = "Alex DeJarnatt", email = "adejarnatt@gmail.com" },
 ]
