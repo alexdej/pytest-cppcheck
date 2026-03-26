@@ -69,6 +69,21 @@ File extensions to collect. Default: `.c .cpp`.
 cppcheck_extensions = .c .cpp .h
 ```
 
+## Caching
+
+Results are cached based on file modification time and `cppcheck_args`. On
+subsequent runs, files that previously passed are skipped. The cache is
+automatically invalidated when a file is modified or `cppcheck_args` changes.
+Caching relies on pytest's built-in cache provider (the `.pytest_cache` directory).
+If the cache provider is disabled (for example with `-p no:cacheprovider`), results
+will not be cached and all files will be re-checked on each run.
+
+To force a full re-check:
+
+```
+pytest --cppcheck --cache-clear
+```
+
 ## License
 
 MIT
