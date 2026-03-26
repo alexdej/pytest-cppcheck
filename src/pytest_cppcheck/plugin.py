@@ -1,5 +1,5 @@
-import shutil
 import subprocess
+import sys
 
 import pytest
 
@@ -27,10 +27,15 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    if config.getoption("cppcheck") and not shutil.which("cppcheck"):
+    if not config.getoption("cppcheck"):
+        return
+    result = subprocess.run(
+        [sys.executable, "-m", "cppcheck", "--version"],
+        capture_output=True,
+    )
+    if result.returncode != 0:
         raise pytest.UsageError(
-            "cppcheck not found on PATH. Install it with your system package "
-            "manager (e.g. apt install cppcheck, brew install cppcheck)."
+            "cppcheck not found. Install it with: pip install cppcheck"
         )
 
 
@@ -55,7 +60,7 @@ class CppcheckFile(pytest.File):
 class CppcheckItem(pytest.Item):
     def runtest(self):
         args = self.config.getini("cppcheck_args")
-        cmd = ["cppcheck", "--quiet", "--error-exitcode=1"] + args + [str(self.path)]
+        cmd = [sys.executable, "-m", "cppcheck", "--quiet", "--error-exitcode=1"] + args + [str(self.path)]
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
             output = result.stderr or result.stdout
