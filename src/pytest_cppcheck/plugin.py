@@ -60,7 +60,7 @@ class CppcheckFile(pytest.File):
 class CppcheckItem(pytest.Item):
     def setup(self):
         mtimes = getattr(self.config, "_cppcheck_mtimes", {})
-        self._mtime = self.path.stat().st_mtime
+        self._mtime = self.path.stat().st_mtime_ns
         args = self.config.getini("cppcheck_args")
         old = mtimes.get(str(self.path))
         if old == [self._mtime, args]:
@@ -77,7 +77,7 @@ class CppcheckItem(pytest.Item):
             raise CppcheckError(output)
         # Cache only on success
         if hasattr(self.config, "_cppcheck_mtimes"):
-            self._mtime = getattr(self, "_mtime", self.path.stat().st_mtime)
+            self._mtime = getattr(self, "_mtime", self.path.stat().st_mtime_ns)
             self.config._cppcheck_mtimes[str(self.path)] = [
                 self._mtime,
                 args,
